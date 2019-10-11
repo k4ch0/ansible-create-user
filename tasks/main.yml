@@ -1,0 +1,116 @@
+---
+# tasks file for create-user
+
+- name: Start create-user role message
+  debug:
+    msg: "Creating the default user... "
+    verbosity: "{{ debug_verbosity_messages | default(3) }}"
+  changed_when: false
+
+
+- name: Creating groups
+  group:
+    name: "{{ item.name }}"
+    gid: "{{ item.gid | default(omit) }}"
+  with_items: "{{ groups_to_create }}"
+  tags: ["users", "groups", "configuration"]
+
+
+
+
+
+
+
+
+
+
+
+
+- name: Check if system_username variable is set up
+  fail:
+    msg: "You must specify the variable 'system_username' to use this role"
+  when: system_username is not defined
+
+- name: Check if system_group variable is set up
+  fail:
+    msg: "You must specify the variable 'system_group' to use this role"
+  when: system_group is not defined
+
+- name: Install zsh
+  become: true
+  apt:
+    name: zsh
+    state: present
+
+- name: Check if group = {{ system_group if system_group is defined else '' }} exists
+  command: getent group {{ system_group if system_group is defined else '' }}
+  register: group_exists
+  ignore_errors: true
+  changed_when: false
+
+- name: Debbuging group_exists variable
+  debug:
+    var: group_exists
+    verbosity: "{{ debug_verbosity_test | default(3) }}"
+  when: debug_mode
+
+- name: Create group = {{ system_group }} if not exists
+  become: true
+  group:
+    name: "{{ system_group }}"
+    gid: "{{ system_gid | default(omit) }}"
+    state: present
+  when: not group_exists.rc == 0
+  tags:
+    - create_user
+
+- name: Check if user = {{ system_username }} exists
+  command: getent passwd {{ system_username }}
+  register: user_exists
+  ignore_errors: true
+  changed_when: false
+
+- name: Debbuging user_exists
+  debug:
+    var: user_exists
+    verbosity: "{{ debug_verbosity_test | default(3) }}"
+  when: debug_mode
+
+- name: Create User = {{ system_username }} if not exists
+  become: true
+  user:
+    name: "{{ system_username }}"
+    password: "{{ system_username_password  if system_username_password is defined else '!'}}"
+    update_password: always
+    uid: "{{ system_uid | default(omit) }}"
+    group: "{{ system_group | default(system_username) }}"
+    groups: "{{ item }}"
+    append: true
+    comment: "{{ system_username_comment if system_username_comment is defined else ''}}"
+    shell: "{{ system_username_shell if system_username_shell is defined else '/bin/bash' }}"
+    createhome: true
+    home: "{{ system_username_homedir | default('/home/' + system_username)  }}"
+    state: present
+  when: not user_exists.rc == 0
+  loop: "{{ system_username_groups }}"
+  tags:
+    - create_user
+
+- name: Allow {{ system_username }} user to have passwordless sudo
+  become: true
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    line: '{{ system_username }} ALL=(ALL) NOPASSWD:ALL'
+    validate: visudo -cf %s
+  tags:
+    - create_user
+
+- name: Change root password
+  become: true
+  user:
+    name: root
+    password: "{{ system_root_password }}"
+    update_password: on_create
+  tags:
+    - create_user
