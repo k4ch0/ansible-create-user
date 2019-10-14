@@ -10,7 +10,7 @@ import collections
 
 logging.basicConfig(level=logging.DEBUG)
 # DEFAULT_HOST = 'all'
-VAR_FILE = "../../../../../ansible-bootstrap-workstation/defaults.yml"
+VAR_FILE = "../../defaults/main.yml"
 
 TESTINFRA_HOSTS = testinfra.utils.ansible_runner.AnsibleRunner(
         os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
