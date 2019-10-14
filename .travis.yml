@@ -1,0 +1,42 @@
+---
+language: python:3.6
+services: docker
+os: linux
+dist: xenial
+sudo: enabled
+branches:
+  only:
+    - master
+    - devel
+    - test
+
+matrix:
+  include:
+    - name: "Linux Mint 19"
+      env:
+        - DISTRO="linuxmintd/mint19-amd64"
+    - name: "Ubuntu"
+      env:
+        - DISTRO="ubuntu/bionic"
+
+git:
+  submodules: false
+
+before_install:
+  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+  - git submodule update --init --recursive
+
+install:
+  - pip install --user --upgrade pip
+  - pip install --user -r requirements.txt
+  - docker pull ${DISTRO}
+
+script:
+  - cd roles/meta-fulltest
+  - molecule test -s
+
+after_sucess:
+  - codedov
+
+notifications:
+  email: false
