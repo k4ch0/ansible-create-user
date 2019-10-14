@@ -20,3 +20,9 @@ system_default_groups:
   # - docker
   # - lpadmin
   # - sambashare
+
+debug_verbosity_test: 3
+debug_verbosity_messages: 1
+
+debug_mode: true
+testing_mode: true
