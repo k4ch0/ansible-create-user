@@ -3,10 +3,6 @@ language: python:3.6
 services:
   - docker
 
-os: linux
-dist: xenial
-sudo: enabled
-
 branches:
   only:
     - master
@@ -22,10 +18,12 @@ env:
     - MOLECULE_DISTRO: archlinux/base
 
 install:
+  # Install test dependencies.
   - pip install --user --upgrade pip
   - pip install --user -r requirements.txt
 
 script:
+  # Run tests.
   - molecule test -s test-ci
 
 after_sucess:
