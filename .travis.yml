@@ -18,7 +18,6 @@ matrix:
 install:
   - pip install --user --upgrade pip
   - pip install --user -r requirements.txt
-  - docker pull ${DISTRO}
 
 script:
   - molecule test -s test-ci
