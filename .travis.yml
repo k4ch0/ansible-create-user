@@ -11,20 +11,9 @@ branches:
     - test
 
 matrix:
-  include:
-    - name: "Linux Mint 19"
-      env:
-        - DISTRO="linuxmintd/mint19-amd64"
-    - name: "Ubuntu"
-      env:
-        - DISTRO="ubuntu/bionic"
-
-git:
-  submodules: false
-
-before_install:
-  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
-  - git submodule update --init --recursive
+  - MOLECULE_DISTRO: ubuntu:18.04
+  - MOLECULE_DISTRO: linuxmintd/mint19-amd64
+  - MOLECULE_DISTRO: archlinux/base
 
 install:
   - pip install --user --upgrade pip
@@ -32,11 +21,13 @@ install:
   - docker pull ${DISTRO}
 
 script:
-  - cd roles/meta-fulltest
-  - molecule test -s
+  - molecule test -s test-ci
 
 after_sucess:
-  - codedov
+  - bash <(curl -s https://codecov.io/bash)
 
 notifications:
-  email: false
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
+  email:
+    on_success: never
+    on_failure: always
