@@ -1,19 +1,25 @@
 ---
 language: python:3.6
-services: docker
+services: 
+  - docker
+
 os: linux
 dist: xenial
 sudo: enabled
+
 branches:
   only:
     - master
     - devel
     - test
 
-matrix:
-  - MOLECULE_DISTRO: ubuntu:18.04
-  - MOLECULE_DISTRO: linuxmintd/mint19-amd64
-  - MOLECULE_DISTRO: archlinux/base
+env:
+  global:
+    - ROLE_NAME: ansible-create-user
+  matrix:
+    - MOLECULE_DISTRO: ubuntu:18.04
+    - MOLECULE_DISTRO: linuxmintd/mint19-amd64
+    - MOLECULE_DISTRO: archlinux/base
 
 install:
   - pip install --user --upgrade pip
