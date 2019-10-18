@@ -9,8 +9,8 @@ import collections
 
 
 logging.basicConfig(level=logging.DEBUG)
-# DEFAULT_HOST = 'all'
-VAR_FILE = "../../defaults/main.yml"
+# # DEFAULT_HOST = 'all'
+VAR_FILE = "../../vars/main.yml"
 
 TESTINFRA_HOSTS = testinfra.utils.ansible_runner.AnsibleRunner(
         os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
@@ -19,14 +19,36 @@ runner = AnsibleRunner(inventory)
 # runner.get_hosts(DEFAULT_HOST)
 
 
+@pytest.fixture()
+def ansible_os_family(Ansible):
+    return Ansible("setup")["ansible_facts"]["ansible_os_family"]
+
+
 @pytest.fixture
-def ansible_variables(host):
+def ansible_variables(host, ansible_os_family):
     variables = runner.run(
         TESTINFRA_HOSTS,
         'include_vars',
         VAR_FILE
     )
     return variables['ansible_facts']
+
+
+@pytest.fixture
+def ansible_group_variables(host, ansible_os_family):
+    if ansible_os_family == "Debian":
+        vars_file = "../../vars/debian.yml"
+    elif ansible_os_family == "Archlinux":
+        vars_file = "../../vars/archlinux.yml"
+    else:
+        raise ValueError("Unsupported distribution: " + ansible_os_family)
+
+    vars = runner.run(
+        TESTINFRA_HOSTS,
+        "include_vars",
+        vars_file
+    )
+    return vars["ansible_facts"]
 
 
 def converttostr(data):
@@ -63,10 +85,11 @@ def test_username(host, ansible_variables):
     assert host.user(myuser).password == mypassword
 
 
-def test_groups(host, ansible_variables):
+def test_groups(host, ansible_variables, ansible_group_variables):
     dict_variables = converttostr(ansible_variables)
+    dict_group_variables = converttostr(ansible_group_variables)
     myuser = dict_variables['system_username']
-    mygroups = dict_variables['system_default_groups']
+    mygroups = dict_group_variables['system_default_groups']
     myactualgroups = host.user(myuser).groups
     myactualgroups.remove(myuser)
 
