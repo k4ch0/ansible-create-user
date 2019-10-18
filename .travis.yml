@@ -17,6 +17,7 @@ env:
     - MOLECULE_DISTRO: ubuntu:18.04
     - MOLECULE_DISTRO: linuxmintd/mint19-amd64
     - MOLECULE_DISTRO: archlinux/base
+    - MOLECULE_DISTRO: jonathonf/manjaros
 
 install:
   # Install test dependencies.
