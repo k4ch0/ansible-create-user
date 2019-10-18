@@ -1,2 +1,19 @@
 ---
 # vars file for ansible-create-user
+
+system_username: luis7238
+system_group: luis7238
+system_gid: 1000
+system_uid: 1000
+system_username_comment: "Luis Cacho"
+# Generated using: mkpasswd PASSWORD --method=sha-512
+system_username_password: $6$0gzjYh9u$k95nyzCMRvP.Xc9BqsBElbzM0/deSv9CqAgkt2q.COqf7JlO73v3twtlIfqzutYaab.k8/TTfMgf2npXIgREN0
+system_username_shell: /bin/bash
+# Generated using: mkpasswd PASSWORD --method=sha-512
+system_root_password: $6$IEhPEk8Lqo$Qq8YtSRfgzVbUkY19bc.UJ439tp3lFGs6R6Vj0amzhBfDPpSy4ZXZn0xM4ox5AZhMQFuQjlGvIzYl0mZA2/r4.
+
+debug_verbosity_test: 3
+debug_verbosity_messages: 1
+
+debug_mode: true
+testing_mode: true
