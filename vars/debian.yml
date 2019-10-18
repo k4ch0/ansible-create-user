@@ -1,0 +1,8 @@
+---
+
+system_default_groups:
+  - adm
+  - cdrom
+  - dip
+  - plugdev
+  - sudo
