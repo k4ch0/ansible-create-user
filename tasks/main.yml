@@ -9,6 +9,12 @@
     - false
 
 
+- name: Gather OS specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_os_family | lower }}.yml"
+
+
 - name: Check if 'system_username' variable is set up
   fail:
     msg: "You must specify the variable 'system_username' to use this role"
