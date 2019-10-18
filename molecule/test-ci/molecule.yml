@@ -60,7 +60,7 @@ scenario:
 
 verifier:
   name: testinfra
-  directory: ../../../../tests-molecule/ansible-create-user/
+  directory: ../../tests/
   options:
     # cache-clear: true
     vvv: false
